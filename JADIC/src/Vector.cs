@@ -3,46 +3,37 @@ using System.Drawing;
 
 public class Vector
 {
-    private double dx;
-    private double dy;
-
-    public double DX
-    {
-        get => dx;
-    }
-    public double DY
-    {
-        get => dy;
-    }
+    public double DX { get; private set; }
+    public double DY { get; private set; }
 
     public Vector(double dx, double dy)
     {
-        this.dx = dx;
-        this.dy = dy;
+        DX = dx;
+        DY = dy;
     }
 
     public Vector(Point from, Point to)
     {
-        dx = to.X - from.X;
-        dy = to.Y - from.Y;
+        DX = to.X - from.X;
+        DY = to.Y - from.Y;
     }
 
     public double Size()
     {
-        return Math.Sqrt(dx * dx + dy * dy);
+        return Math.Sqrt(DX * DX + DY * DY);
     }
 
     public void Normalize()
     {
         var size = Size();
-        dx = dx / size;
-        dy = dy / size;
+        DX /= size;
+        DY /= size;
     }
 
     public void Multiply(double alpha)
     {
-        dx *= alpha;
-        dy *= alpha;
+        DX *= alpha;
+        DY *= alpha;
     }
 
     public static Point Add(Point start, Vector displacement)
@@ -51,5 +42,12 @@ public class Vector
         int newY = (int)(start.Y + displacement.DY);
 
         return new Point(newX, newY);
+    }
+
+    public static Vector FromPolar(double angle, double size)
+    {
+        var vec = new Vector(Math.Sin(angle), Math.Cos(angle));
+        vec.Multiply(size);
+        return vec;
     }
 }

@@ -78,6 +78,8 @@ public class CosmicBackground : IDrawable
 
     public void Render(Size resolution, Graphics container)
     {
+        Update();
+
         container.Clear(Color.Black);
 
         RenderLevel(container, FirstLevel, 5);

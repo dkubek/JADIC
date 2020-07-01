@@ -21,14 +21,13 @@ namespace JADIC
 
             // Main player initialization
             int edgeOffset = 50;
-            Size playerHitbox = new Size(50, 50);
             Rectangle playerBounds = 
                 new Rectangle(edgeOffset, edgeOffset, 
                 windowAreaSize.Width / 2 - 2 * edgeOffset, 
                 windowAreaSize.Height - 2 * edgeOffset);
             Point startingPosition = new Point(-100, 400);
             Player player =
-                new Player(startingPosition, playerHitbox, playerBounds);
+                new Player(startingPosition, playerBounds);
 
             Queue<ControlElement> controlElements = new Queue<ControlElement>(2);
             controlElements.Enqueue(new LinearTransition(CenterOfRectangle(playerBounds)));

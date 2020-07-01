@@ -1,39 +1,38 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 public class Player : GameObject 
 {
-    public int PROJECTILE_COOLDOWN = 25;
+    public const int PROJECTILE_COOLDOWN = 25;
+    public const int SPEED = 5;
 
-    public readonly int SPEED = 5;
+    const int PLAYER_SIZE = 50;
+
     public int HorizontalSign = 0;
     public int VerticalSign = 0;
-    public Rectangle BoundingBox;
-    public Control Controls;
-    public int Lives = 3;
-
     public int projectileCooldownCurrent = 0;
 
-    private readonly Brush myBrush;
+    readonly Brush brush;
+
     public Player(
-        Point startPosition, Size hitbox, Rectangle boundingBox)
+        Point startPosition, Rectangle boundingBox)
     {
-        Location = startPosition;
-        Hitbox = hitbox;
+        Position = startPosition;
+        HitboxSize = new Size(PLAYER_SIZE, PLAYER_SIZE);
         BoundingBox = boundingBox;
+        Lives = 3;
 
-        // TODO: DEFAULT CONTROL
-
-        myBrush = new SolidBrush(Color.White);
+        brush = new SolidBrush(KeyColor);
     }
 
     public override void Update()
     {
         if (projectileCooldownCurrent != 0)
-        {
             projectileCooldownCurrent--;
-        }
 
-        Controls.Move(this);
+        if (Lives > 0)
+            base.Update();
     }
 
     public PlayerProjectile SpawnProjectile()
@@ -42,7 +41,8 @@ public class Player : GameObject
         {
             var center = Center();
             var projectile = new PlayerProjectile(
-                new Point(center.X + Hitbox.Width / 2, center.Y));
+                new Point(center.X + HitboxSize.Width / 2, center.Y),
+                new Size(10, 10));
 
             projectileCooldownCurrent = PROJECTILE_COOLDOWN;
             return projectile;
@@ -54,61 +54,89 @@ public class Player : GameObject
     private Point Center()
     {
         return new Point(
-            Location.X + Hitbox.Width / 2,
-            Location.Y + Hitbox.Height / 2);
+            Position.X + HitboxSize.Width / 2,
+            Position.Y + HitboxSize.Height / 2);
     }
 
     public override void Render(Size resolution, Graphics container)
     {
         var trianglePoints = generateTrianglePoints();
-        container.FillPolygon(myBrush, trianglePoints);
+        container.FillPolygon(brush, trianglePoints);
     }
 
     private Point[] generateTrianglePoints()
     {
         Point center = Center();
         Point topLeft = new Point(
-            center.X - Hitbox.Width / 2,
-            center.Y - Hitbox.Height / 2);
+            center.X - HitboxSize.Width / 2,
+            center.Y - HitboxSize.Height / 2);
         Point bottomLeft = new Point(
-            center.X - Hitbox.Width / 2,
-            center.Y + Hitbox.Height / 2);
+            center.X - HitboxSize.Width / 2,
+            center.Y + HitboxSize.Height / 2);
         Point middleRight = new Point(
-            center.X + Hitbox.Width / 2,
+            center.X + HitboxSize.Width / 2,
             center.Y);
 
         Point[] points = { topLeft, middleRight, bottomLeft };
         return points;
     }
+
+    public override bool DetectCollision(GameObject other)
+    {
+        if (other is PlayerProjectile)
+            return false;
+
+        return base.DetectCollision(other);
+    }
 }
 
-public class PlayerProjectile : GameObject
+public class Projectile : GameObject
 {
-    public readonly int SPEED = 15;
-    public Control Controls;
+    readonly int PARTICLE_MAX_SIZE = 3;
+    readonly int PARTICLE_MIN_SIZE = 1;
 
-    private readonly Brush myBrush;
-
-    public PlayerProjectile(Point startPosition)
+    protected Brush keyBrush;
+    
+    public Projectile(
+        Point startPosition, Size hitboxSize)
     {
-        Location = startPosition;
-        Hitbox = new Size(10, 10);
+        Position = startPosition;
+        HitboxSize = hitboxSize;
+        Lives = 1;
+
+        keyBrush = new SolidBrush(Color.White);
+    }
+    public override void Render(Size resolution, Graphics container)
+    {
+        container.FillRectangle(
+            keyBrush,
+            new Rectangle(Position, HitboxSize));
+    }
+
+    public override List<Particle> Destroy()
+        => Destroy(PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE);
+}
+
+public class PlayerProjectile : Projectile 
+{
+    const int SPEED = 15;
+
+    public PlayerProjectile(Point startPosition, Size hitboxSize) : base(startPosition, hitboxSize)
+    {
+        HitboxSize = hitboxSize;
+        Lives = 1;
 
         Vector displacement = new Vector(SPEED, 0);
         Controls = new Control(new ConstantDisplacement(displacement));
 
-        myBrush = new SolidBrush(Color.White);
+        keyBrush = new SolidBrush(Color.White);
     }
 
-    public override void Update()
+    public override bool DetectCollision(GameObject other)
     {
-        Controls.Move(this);
-    }
-
-    public override void Render(Size resolution, Graphics container)
-    {
-        container.FillRectangle(
-            myBrush,
-            new Rectangle(Location, Hitbox));
+        if (other is Player)
+            return false;
+        
+        return base.DetectCollision(other);
     }
 }

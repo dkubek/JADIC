@@ -7,15 +7,16 @@ public class ControlElement
 {
     public bool isRunning = false;
 
-    public virtual void Move(GameObject go)
-    {
-    }
+    public virtual Point NextPosition(Point currentPosition)
+        => currentPosition;
 }
 
 public class Control
 {
     private Queue<ControlElement> controls;
     private ControlElement currentControl;
+
+    public Control() : this(new ControlElement()) { }
 
     public Control(ControlElement controlElement)
     {
@@ -35,18 +36,21 @@ public class Control
         currentControl.isRunning = true;
     }
 
-    public void Move(GameObject go)
+    public Point NextPosition(Point currentPosition)
     {
+        Point newPosition = currentPosition;
         if (currentControl.isRunning)
         {
-            currentControl.Move(go);
+            newPosition = currentControl.NextPosition(currentPosition);
         }
         else if (controls.Count != 0)
         {
             currentControl = controls.Dequeue();
             currentControl.isRunning = true;
-            currentControl.Move(go);
+            newPosition = currentControl.NextPosition(currentPosition);
         }
+
+        return newPosition;
     }
 }
 
@@ -59,36 +63,34 @@ public class ConstantDisplacement : ControlElement
         this.displacement = displacement;
     }
 
-    public override void Move(GameObject go)
-    {
-        go.Location = Vector.Add(go.Location, displacement);
-    }
+    public override Point NextPosition(Point currentPosition)
+        => Vector.Add(currentPosition, displacement);
 }
 
 public class LinearTransition : ControlElement
 {
     const int TransitionSpeed = 3;
-    private Point dest;
+    private Point destinationPosition;
 
     public LinearTransition(Point destination)
     {
-        dest = destination;
+        destinationPosition = destination;
     }
 
-    public override void Move(GameObject go)
+    public override Point NextPosition(Point currentPosition)
     {
-        Vector displacement = new Vector(go.Location, dest);
+        Vector displacement = new Vector(currentPosition, destinationPosition);
 
         if (displacement.Size() <= TransitionSpeed)
         {
-            go.Location = dest;
             isRunning = false;
+            return destinationPosition;
         }
         else
         {
             displacement.Normalize();
             displacement.Multiply(TransitionSpeed);
-            go.Location = Vector.Add(go.Location, displacement);
+            return Vector.Add(currentPosition, displacement);
         }
     }
 }
@@ -100,28 +102,28 @@ public class PlayerControl : ControlElement
     {
         this.player = player;
     }
-    public override void Move(GameObject go)
+    public override Point NextPosition(Point currentPosition)
     {
-        Point newLocation = new Point(
-            go.Location.X + player.HorizontalSign * player.SPEED,
-            go.Location.Y + player.VerticalSign * player.SPEED);
+        Point newPosition = new Point(
+            currentPosition.X + player.HorizontalSign * Player.SPEED,
+            currentPosition.Y + player.VerticalSign * Player.SPEED);
 
-        go.Location = StayWithinBounds(newLocation);
+        return StayWithinBounds(newPosition);
     }
 
-    private Point StayWithinBounds(Point location)
+    private Point StayWithinBounds(Point position)
     {
         int rightBound =
-            player.BoundingBox.Width + player.BoundingBox.X - player.Hitbox.Width;
+            player.BoundingBox.Width + player.BoundingBox.X - player.HitboxSize.Width;
         int bottomBound =
-            player.BoundingBox.Height + player.BoundingBox.Y - player.Hitbox.Height;
+            player.BoundingBox.Height + player.BoundingBox.Y - player.HitboxSize.Height;
 
         int boundedX = Math.Min(
             rightBound,
-            Math.Max(location.X, player.BoundingBox.X));
+            Math.Max(position.X, player.BoundingBox.X));
         int boundedY = Math.Min(
             bottomBound,
-            Math.Max(location.Y, player.BoundingBox.Y));
+            Math.Max(position.Y, player.BoundingBox.Y));
 
         return new Point(boundedX, boundedY);
     }

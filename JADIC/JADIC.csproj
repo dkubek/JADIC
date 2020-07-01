@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="src\Control.cs" />
     <Compile Include="src\CosmicBackground.cs" />
+    <Compile Include="src\Enemy.cs" />
     <Compile Include="src\Game.cs" />
     <Compile Include="src\Overlay.cs" />
     <Compile Include="src\Player.cs" />

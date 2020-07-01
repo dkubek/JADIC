@@ -14,9 +14,6 @@ public class Overlay : IDrawable
     {
         this.world = world;
     }
-    public void Update()
-    {
-    }
 
     public void Render(Size resolution, Graphics container)
     {
@@ -43,7 +40,6 @@ public class Overlay : IDrawable
         RenderHearts(
             new Point(heartsX, heartsY),
             container);
-
     }
 
     private void RenderBorder(
@@ -67,7 +63,7 @@ public class Overlay : IDrawable
         int meterWidth =
             COOLDOWN_METER_WIDTH -
             world.MainPlayer.projectileCooldownCurrent * COOLDOWN_METER_WIDTH /
-            world.MainPlayer.PROJECTILE_COOLDOWN;
+            Player.PROJECTILE_COOLDOWN;
 
         container.FillRectangle(
             new SolidBrush(Color.White),
@@ -83,7 +79,7 @@ public class Overlay : IDrawable
         for (int i = 0; i < world.MainPlayer.Lives; i++)
         {
             container.DrawImage(
-                JADIC.Properties.Resources.heart,
+                JADIC.Properties.Resources.Heart,
                 new Rectangle(
                     baseCoordinates.X + i * (HEART_PADDING + HEART_SIZE), baseCoordinates.Y,
                     HEART_SIZE, HEART_SIZE));
