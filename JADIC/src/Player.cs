@@ -21,7 +21,7 @@ public class Player : GameObject
         Position = startPosition;
         HitboxSize = new Size(PLAYER_SIZE, PLAYER_SIZE);
         BoundingBox = boundingBox;
-        Lives = 3;
+        Lives = 5;
 
         brush = new SolidBrush(KeyColor);
     }
@@ -138,5 +138,20 @@ public class PlayerProjectile : Projectile
             return false;
         
         return base.DetectCollision(other);
+    }
+}
+
+public class EnemyProjectile : Projectile
+{
+    const int SPEED = 18;
+    static Size hitboxSize = new Size(5, 5);
+
+    public EnemyProjectile(Point startPosition, Point destination)
+        : base(startPosition, hitboxSize)
+    {
+        Vector displacement = new Vector(startPosition, destination);
+        Controls = new Control(new ConstantDisplacement(displacement));
+
+        keyBrush = new SolidBrush(Color.Red);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -9,8 +8,9 @@ public class Scene
     public bool isRunning;
 
     private int enemies = 0;
-    private Random rng = new Random(42069);
+    private Random rng = new Random();
     private int spawnCooldown = 0;
+
     public Scene(World world)
     {
         MainWorld = world;
@@ -33,13 +33,13 @@ public class Scene
 
         if (spawnCooldown == 0)
         {
-            if (enemies < 5)
+            if (enemies < 20)
             {
-                if (rng.NextDouble() < 0.20)
+                if (rng.NextDouble() < 0.30)
                 {
                     generateEnemy();
                     enemies++;
-                    spawnCooldown = 200;
+                    spawnCooldown = 100;
                 }
             }
         }
@@ -53,10 +53,12 @@ public class Scene
     {
         var enemy = new Enemy(
             new Point(
-                MainWorld.Resolution.Width + 200,
-                rng.Next(200, MainWorld.Resolution.Height - 200)));
-        var displacement = new Vector(-2, 0);
+                MainWorld.Resolution.Width,
+                rng.Next(100, MainWorld.Resolution.Height - 100)));
+
+        var displacement = new Vector(-3, 0);
         enemy.Controls = new Control(new ConstantDisplacement(displacement));
+
         MainWorld.GameObjects.Add(enemy);
     }
 
@@ -134,46 +136,66 @@ public class Scene
         RemoveOutOfBoundsParticles();
     }
 
+    private void RemoveOutOfBoundsGameObjects()
+    {
+        MainWorld.GameObjects.RemoveAll(
+            particle => !MainWorld.DespawnBounds.Contains(particle.Position));
+    }
     private void RemoveOutOfBoundsParticles()
     { 
         MainWorld.Particles.RemoveAll(
             particle => !MainWorld.DespawnBounds.Contains(particle.Position));
     }
 
-    private void RemoveOutOfBoundsGameObjects()
-    {
-        MainWorld.GameObjects.RemoveAll(
-            particle => !MainWorld.DespawnBounds.Contains(particle.Position));
-    }
 
     public void Render()
     {
         var resolution = MainWorld.Resolution;
         var graphics_container = MainWorld.bmGraphics;
 
+        RenderBackground(resolution, graphics_container);
+        RenderPlayer(resolution, graphics_container);
+        RenderGameObjects(resolution, graphics_container);
+        RenderParticles(resolution, graphics_container);
+        RenderOverlay(resolution, graphics_container);
+    }
+
+    private void RenderBackground(Size resolution, Graphics graphics_container)
+    {
         MainWorld.bg.Render(resolution, graphics_container);
+    }
 
+    private void RenderPlayer(Size resolution, Graphics graphics_container)
+    {
         MainWorld.MainPlayer.Render(resolution, graphics_container);
+    }
 
+    private void RenderOverlay(Size resolution, Graphics graphics_container)
+    {
+        MainWorld.overlay.Render(resolution, graphics_container);
+    }
+
+    private void RenderGameObjects(Size resolution, Graphics graphics_container)
+    {
         foreach (IDrawable go in MainWorld.GameObjects)
         {
             go.Render(resolution, graphics_container);
         }
+    }
 
+    private void RenderParticles(Size resolution, Graphics graphics_container)
+    {
         foreach (IDrawable particle in MainWorld.Particles)
         {
             particle.Render(resolution, graphics_container);
         }
-
-        MainWorld.overlay.Render(resolution, graphics_container);
     }
 
     public void HandleKeys(Keys keycode, bool release)
     {
-        // TODO: Handle player keys
         PlayerControl.HandlePlayerKeys(MainWorld.MainPlayer, keycode, release);
 
-        // TODO: Decide what to do, can also decide to do nothing
+        // TODO: SCENE SPECIFIC
         if (keycode == Keys.Space && ! release)
         {
             var projectile = MainWorld.MainPlayer.SpawnProjectile();

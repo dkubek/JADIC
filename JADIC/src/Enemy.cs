@@ -29,6 +29,8 @@ public class Enemy : GameObject
         return base.DetectCollision(other);
     }
 
+    public 
+
     private Point[] generateDiamondPoints()
     {
         Point top = new Point(

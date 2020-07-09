@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Deployment.Application;
 using System.Drawing;
-using System.Windows.Forms;
 
 public interface IDrawable
 {
@@ -77,6 +75,7 @@ public class Particle : IDrawable
         this.controls = controls;
         keyBrush = new SolidBrush(color);
    }
+
    public void Render(Size resolution, Graphics container)
     {
         UpdatePosition();
