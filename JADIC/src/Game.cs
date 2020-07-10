@@ -1,36 +1,98 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Drawing;
+using JADIC.Scenes;
 
+/// <summary>
+/// Game is a collection of scenes. The Game class oversees and manages 
+/// the order of scenes.
+/// </summary>
 public class Game
 {
-    public List<Scene> Scenes;
+    private Queue<Scene> Scenes;
     public World MainWorld;
-    private Scene currentScene;
+    private Scene currentScene = null;
 
-    public Game(List<Scene> scenes, World world)
+    public Game(Size windowAreaSize)
     {
-        Scenes = scenes;
-        MainWorld = world;
-
-        // TODO: TEMPORARY
-        currentScene = new EndlessMode(MainWorld);
-        currentScene.isRunning = true;
+        Initialize(windowAreaSize);
     }
 
+    private void Initialize(Size windowAreaSize)
+    {
+        Player player = InitializePlayer(windowAreaSize);
+        InitializeWorld(windowAreaSize, player);
+        InitializeScenes();
+    }
+
+    private Player InitializePlayer(Size windowAreaSize)
+    {
+        Point startingPosition = new Point(-100, 400);
+        Rectangle playerBounds = GetPlayerBounds(windowAreaSize, 50);
+        return new Player(startingPosition, playerBounds);
+    }
+
+    private Rectangle GetPlayerBounds(Size windowAreaSize, int edgeOffset)
+    {
+        Rectangle playerBounds = 
+            new Rectangle(
+                edgeOffset, edgeOffset, 
+                windowAreaSize.Width / 2 - 2 * edgeOffset, 
+                windowAreaSize.Height - 2 * edgeOffset);
+
+        return playerBounds;
+    }
+  
+    private void InitializeWorld(Size windowAreaSize, Player player)
+    {
+        MainWorld = new World(windowAreaSize, player);
+    }
+
+    private void InitializeScenes()
+    {
+        Scenes = new Queue<Scene>();
+        Scenes.Enqueue(new Intro(MainWorld));
+        Scenes.Enqueue(new FlyIn(MainWorld));
+        Scenes.Enqueue(new EndlessMode(MainWorld));
+        Scenes.Enqueue(new GameOver(MainWorld));
+    }
+
+    /// <summary>
+    /// This method should be called on every tick to update the game and 
+    /// progress to the next frame.
+    /// </summary>
     public void NextFrame()
     {
-        if (currentScene.isRunning)
+        if (currentScene != null && currentScene.isRunning)
         {
             currentScene.Update();
-            currentScene.Render();
+            currentScene.Render(MainWorld.Resolution, MainWorld.bmGraphics);
         }
-
-        // TODO: Load next scene
+        else if (Scenes.Count != 0)
+        {
+            currentScene = Scenes.Dequeue();
+            currentScene.isRunning = true;
+            currentScene.Initialize();
+        }
+        else
+        {
+            RestartGame();
+        }
     }
 
-    public void HandleKey(Keys keycode, bool release)
+    private void RestartGame()
     {
-        // TODO: Pass the rest to scene
+        var windowAreaSize = MainWorld.Resolution;
+        Player player = InitializePlayer(windowAreaSize);
+        InitializeWorld(windowAreaSize, player);
+
+        Scenes.Enqueue(new FlyIn(MainWorld));
+        Scenes.Enqueue(new EndlessMode(MainWorld));
+        Scenes.Enqueue(new GameOver(MainWorld));
+    }
+
+    public void HandleKeys(Keys keycode, bool release)
+    {
         currentScene.HandleKeys(keycode, release);
     }
 }

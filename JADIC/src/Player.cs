@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using JADIC.Controls;
 using System.Drawing;
 
 public class Player : GameObject 
@@ -21,7 +20,7 @@ public class Player : GameObject
         Position = startPosition;
         HitboxSize = new Size(PLAYER_SIZE, PLAYER_SIZE);
         BoundingBox = boundingBox;
-        Lives = 5;
+        Lives = 3;
 
         brush = new SolidBrush(KeyColor);
     }
@@ -87,30 +86,6 @@ public class Player : GameObject
             return false;
 
         return base.DetectCollision(other);
-    }
-}
-
-public class Projectile : GameObject
-{
-    protected Brush keyBrush;
-    
-    public Projectile(
-        Point startPosition, Size hitboxSize)
-    {
-        Position = startPosition;
-        HitboxSize = hitboxSize;
-        Lives = 1;
-
-        PARTICLE_MAX_SIZE = 3;
-        PARTICLE_MIN_SIZE = 1;
-
-        keyBrush = new SolidBrush(Color.White);
-    }
-    public override void Render(Size resolution, Graphics container)
-    {
-        container.FillRectangle(
-            keyBrush,
-            new Rectangle(Position, HitboxSize));
     }
 }
 

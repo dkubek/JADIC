@@ -101,7 +101,7 @@ public class Overlay : IDrawable
     private void RenderScore(
         Point baseCoordinates, Graphics container)
     {
-        var font = new Font("Consolas", SCORE_FONT_SIZE);
+        var font = new Font("Gadugi", SCORE_FONT_SIZE, FontStyle.Bold);
         container.DrawString(
             world.TotalScore.ToString(),
             font,

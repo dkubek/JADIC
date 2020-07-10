@@ -35,7 +35,7 @@
             // mainTimer
             // 
             this.mainTimer.Interval = 16;
-            this.mainTimer.Tick += new System.EventHandler(this.mainTimer_Tick);
+            this.mainTimer.Tick += new System.EventHandler(this.MainTimer_Tick);
             // 
             // JADIC
             // 

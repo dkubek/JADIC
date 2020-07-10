@@ -1,4 +1,4 @@
-﻿using System;
+﻿using JADIC.Controls;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -8,7 +8,7 @@ public class Enemy : GameObject
     const int PROJECTILE_COOLDOWN = 100;
 
     private int currentProjectileCooldown = PROJECTILE_COOLDOWN;
-    private double PROJECTILE_CHANCE = 0.3;
+    readonly double projectileProbability = 0.3;
 
     private readonly Brush brush;
     public Enemy(Point startingPosition)
@@ -21,6 +21,12 @@ public class Enemy : GameObject
         KeyColor = ColorTranslator.FromHtml("#c70039");
         brush = new SolidBrush(KeyColor);
     } 
+
+    public Enemy(Point startingPosition, double projectileProbability) 
+        : this(startingPosition)
+    {
+        this.projectileProbability = projectileProbability;
+    }
 
     public override void Render(Size resolution, Graphics container)
     {
@@ -37,7 +43,7 @@ public class Enemy : GameObject
         }
         else
         {
-            if (world.RandomGen.NextDouble() < PROJECTILE_CHANCE)
+            if (world.RandomGen.NextDouble() < projectileProbability)
             {
                 var projectile = SpawnProjectile(world.MainPlayer.Position);
                 projectiles.Add(projectile);
@@ -88,7 +94,7 @@ public class EnemyProjectile : Projectile
         displacement.Multiply(ENEMY_PROJECTILE_SPEED);
         Controls = new Control(new ConstantDisplacement(displacement));
 
-        keyBrush = new SolidBrush(Color.Red);
+        keyBrush = new SolidBrush(Color.Tomato);
     }
 
     public override bool DetectCollision(GameObject other)
