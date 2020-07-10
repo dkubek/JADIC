@@ -6,12 +6,12 @@ public class CosmicBackground : IDrawable
     private Point[] FirstLevel;
     private Point[] SecondLevel;
     private Point[] ThirdLevel;
-    
+
     private readonly int baseSpeed;
     private Size bounds;
-    private Random rnd = new Random();
-
-    private SolidBrush starBrush;
+    
+    private readonly Random rnd = new Random();
+    private readonly SolidBrush starBrush;
 
     public CosmicBackground(int stars, int baseSpeed, Size bounds)
     {

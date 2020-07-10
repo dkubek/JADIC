@@ -1,15 +1,13 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
-public class Scene
+public abstract class Scene
 {
     public World MainWorld;
     public bool isRunning;
 
-    private int enemies = 0;
-    private Random rng = new Random();
-    private int spawnCooldown = 0;
+    protected bool isPlayerCollidedd = false;
 
     public Scene(World world)
     {
@@ -17,71 +15,101 @@ public class Scene
         isRunning = false;
     }
 
-    public void Update()
-    {
-        // Update player position
-        MainWorld.MainPlayer.Update();
+    public abstract void Update();
 
-        // Update game objects
+    protected virtual void UpdatePlayer()
+    {
+        MainWorld.MainPlayer.Update();
+    }
+
+    protected virtual void UpdateGameObjects()
+    {
         foreach (GameObject go in MainWorld.GameObjects)
         {
             go.Update();
         }
+    }
 
-        HandleCollisions();
-        RemoveExpired();
-
-        if (spawnCooldown == 0)
+    protected void PerformActions()
+    {
+        var actionGameObjects = new List<GameObject>();
+        foreach (GameObject go in MainWorld.GameObjects)
         {
-            if (enemies < 20)
+            actionGameObjects.AddRange(go.Action(MainWorld));
+        }
+
+        MainWorld.GameObjects.AddRange(actionGameObjects);
+    }
+
+    protected void HandleCollisions(List<GameObject> collisions)
+    {
+        SubtractLife(collisions);
+        AddScore(collisions);
+        RemoveDestroyed(collisions);
+
+        // Add rest back to Game objects
+        MainWorld.GameObjects.AddRange(collisions);
+    }
+
+    private void SubtractLife(List<GameObject> collisions)
+    {
+        if (isPlayerCollidedd)
+        {
+            MainWorld.MainPlayer.Lives--;
+        }
+
+        collisions.ForEach(go => go.Lives--);
+    }
+
+    private void AddScore(List<GameObject> collisions)
+    {
+        foreach (GameObject go in collisions)
+        {
+            if (go.Lives <= 0)
             {
-                if (rng.NextDouble() < 0.30)
-                {
-                    generateEnemy();
-                    enemies++;
-                    spawnCooldown = 100;
-                }
+                MainWorld.TotalScore += go.Score;
             }
         }
-        else
+    }
+
+    private void RemoveDestroyed(List<GameObject> collisions)
+    {
+        foreach (GameObject go in collisions)
         {
-            spawnCooldown--;
+            if (go.Lives <= 0)
+            {
+                MainWorld.Particles.AddRange(go.Destroy());
+            }
         }
+
+        collisions.RemoveAll(go => go.Lives <= 0);
     }
 
-    private void generateEnemy()
+    protected List<GameObject> ExtractCollisions()
     {
-        var enemy = new Enemy(
-            new Point(
-                MainWorld.Resolution.Width,
-                rng.Next(100, MainWorld.Resolution.Height - 100)));
+        isPlayerCollidedd = false;
+        bool[] collisions = new bool[MainWorld.GameObjects.Count];
 
-        var displacement = new Vector(-3, 0);
-        enemy.Controls = new Control(new ConstantDisplacement(displacement));
+        DetectCollisionsWithPlayer(collisions);
+        DetectCollisionsBetweenGameObjects(collisions);
 
-        MainWorld.GameObjects.Add(enemy);
+        return ExtractCollidedGameObjects(collisions);
     }
 
-    private void HandleCollisions()
-    {
-        HandleCollisionsWithPlayer();
-        HandleCollisionsBetweenGameObjects();
-    }
-
-    private void HandleCollisionsWithPlayer()
+    private void DetectCollisionsWithPlayer(bool[] collided)
     {
         for (int i = 0; i < MainWorld.GameObjects.Count; i++)
         {
             var other = MainWorld.GameObjects[i];
             if (MainWorld.MainPlayer.DetectCollision(other))
             {
-                other.Lives--;
-                MainWorld.MainPlayer.Lives--;
+                collided[i] = true;
+                isPlayerCollidedd = true;
             }
         }
     }
 
-    private void HandleCollisionsBetweenGameObjects()
+    private void DetectCollisionsBetweenGameObjects(bool[] collided)
     {
         for (int i = 0; i < MainWorld.GameObjects.Count; i++)
         {
@@ -91,43 +119,37 @@ public class Scene
                 var other = MainWorld.GameObjects[j];
                 if (main.DetectCollision(other))
                 {
-                    other.Lives--;
-                    main.Lives--;
+                    collided[i] = true;
+                    collided[j] = true;
                 }
             }
         }
     }
 
-    private void RemoveExpired()
+    private List<GameObject> ExtractCollidedGameObjects(bool[] collided)
     {
-        RemoveDestoyedGameObjects();
-        RemoveOutOfBounds();
-    }
-
-    private void RemoveDestoyedGameObjects()
-    {
-        var player = MainWorld.MainPlayer;
-        if (player.Lives <= 0)
-        {
-            MainWorld.Particles.AddRange(player.Destroy());
-        }
-
-        int destroyed = 0;
+        var newGameObjects = new List<GameObject>();
+        var collisions = new List<GameObject>();
         for (int i = 0; i < MainWorld.GameObjects.Count; i++)
         {
-            var gameObject = MainWorld.GameObjects[i];
-
-            if (gameObject.Lives <= 0)
+            if (collided[i])
             {
-                MainWorld.Particles.AddRange(gameObject.Destroy());
-                destroyed++;
+                collisions.Add(MainWorld.GameObjects[i]);
+            }
+            else
+            {
+                newGameObjects.Add(MainWorld.GameObjects[i]);
             }
         }
 
-        if (destroyed != 0)
-        {
-            MainWorld.GameObjects.RemoveAll(go => go.Lives <= 0);
-        }
+        MainWorld.GameObjects = newGameObjects;
+        return collisions;
+    }
+
+    protected void CleanUp()
+    {
+        isPlayerCollidedd = false;
+        RemoveOutOfBounds();
     }
 
     private void RemoveOutOfBounds()
@@ -146,7 +168,6 @@ public class Scene
         MainWorld.Particles.RemoveAll(
             particle => !MainWorld.DespawnBounds.Contains(particle.Position));
     }
-
 
     public void Render()
     {
@@ -193,10 +214,15 @@ public class Scene
 
     public void HandleKeys(Keys keycode, bool release)
     {
-        PlayerControl.HandlePlayerKeys(MainWorld.MainPlayer, keycode, release);
+        HandlePlayerKeys(keycode, release);
+    }
 
-        // TODO: SCENE SPECIFIC
-        if (keycode == Keys.Space && ! release)
+    protected void HandlePlayerKeys(Keys keycode, bool release)
+    {
+        PlayerControl.HandlePlayerMovementKeys(
+            MainWorld.MainPlayer, keycode, release);
+
+        if (keycode == Keys.Space && !release)
         {
             var projectile = MainWorld.MainPlayer.SpawnProjectile();
             if (projectile != null)
@@ -205,4 +231,65 @@ public class Scene
             }
         }
     }
+}
+
+public class EndlessMode : Scene
+{
+    private int enemies = 0;
+    private int spawnCooldown = 0;
+
+    public EndlessMode(World world) : base(world) { }
+
+    public override void Update()
+    {
+        UpdatePlayer();
+        UpdateGameObjects();
+
+        var collisions = ExtractCollisions();
+        HandleCollisions(collisions);
+
+        PerformActions();
+
+        SpawnEnemies();
+
+        CleanUp();
+    }
+
+    private void SpawnEnemies()
+    {
+        if (spawnCooldown == 0)
+        {
+            if (enemies < 20)
+            {
+                if (MainWorld.RandomGen.NextDouble() < 0.30)
+                {
+                    generateEnemy();
+                    enemies++;
+                    spawnCooldown = 100;
+                }
+            }
+        }
+        else
+        {
+            spawnCooldown--;
+        }
+    }
+
+    private void generateEnemy()
+    {
+        var enemy = new Enemy(
+            new Point(
+                MainWorld.Resolution.Width,
+                MainWorld.RandomGen.Next(100, MainWorld.Resolution.Height - 100)));
+
+        var destination = new Point(MainWorld.Resolution.Width / 2, enemy.Position.Y);
+
+        var controls = new List<ControlElement>();
+        controls.Add(new LinearTransition(destination, 3));
+        controls.Add(new Follow(MainWorld.MainPlayer, 5));
+        enemy.Controls = new Control(controls);
+
+        MainWorld.GameObjects.Add(enemy);
+    }
+
 }

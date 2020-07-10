@@ -92,9 +92,6 @@ public class Player : GameObject
 
 public class Projectile : GameObject
 {
-    readonly int PARTICLE_MAX_SIZE = 3;
-    readonly int PARTICLE_MIN_SIZE = 1;
-
     protected Brush keyBrush;
     
     public Projectile(
@@ -104,6 +101,9 @@ public class Projectile : GameObject
         HitboxSize = hitboxSize;
         Lives = 1;
 
+        PARTICLE_MAX_SIZE = 3;
+        PARTICLE_MIN_SIZE = 1;
+
         keyBrush = new SolidBrush(Color.White);
     }
     public override void Render(Size resolution, Graphics container)
@@ -112,9 +112,6 @@ public class Projectile : GameObject
             keyBrush,
             new Rectangle(Position, HitboxSize));
     }
-
-    public override List<Particle> Destroy()
-        => Destroy(PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE);
 }
 
 public class PlayerProjectile : Projectile 
@@ -124,7 +121,6 @@ public class PlayerProjectile : Projectile
     public PlayerProjectile(Point startPosition, Size hitboxSize) : base(startPosition, hitboxSize)
     {
         HitboxSize = hitboxSize;
-        Lives = 1;
 
         Vector displacement = new Vector(SPEED, 0);
         Controls = new Control(new ConstantDisplacement(displacement));
@@ -138,20 +134,5 @@ public class PlayerProjectile : Projectile
             return false;
         
         return base.DetectCollision(other);
-    }
-}
-
-public class EnemyProjectile : Projectile
-{
-    const int SPEED = 18;
-    static Size hitboxSize = new Size(5, 5);
-
-    public EnemyProjectile(Point startPosition, Point destination)
-        : base(startPosition, hitboxSize)
-    {
-        Vector displacement = new Vector(startPosition, destination);
-        Controls = new Control(new ConstantDisplacement(displacement));
-
-        keyBrush = new SolidBrush(Color.Red);
     }
 }

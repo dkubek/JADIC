@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Windows.Forms;
 
 public class Overlay : IDrawable
 {
@@ -8,6 +9,7 @@ public class Overlay : IDrawable
     const int MOVE_JITTER = 2;
     const int HEART_SIZE = 50;
     const int HEART_PADDING = 10;
+    const int SCORE_FONT_SIZE = 25;
 
     private World world;
     public Overlay(World world)
@@ -40,6 +42,16 @@ public class Overlay : IDrawable
         RenderHearts(
             new Point(heartsX, heartsY),
             container);
+
+        var font = new Font("Consolas", SCORE_FONT_SIZE);
+        var textSize = TextRenderer.MeasureText(world.TotalScore.ToString(), font);
+
+        int scoreX = resolution.Width - EDGE_OFFSET - 20 - textSize.Width - dx;
+        int scoreY = EDGE_OFFSET + 20 - dy;
+        RenderScore(
+            new Point(scoreX, scoreY),
+            container);
+
     }
 
     private void RenderBorder(
@@ -84,5 +96,16 @@ public class Overlay : IDrawable
                     baseCoordinates.X + i * (HEART_PADDING + HEART_SIZE), baseCoordinates.Y,
                     HEART_SIZE, HEART_SIZE));
         }
+    }
+
+    private void RenderScore(
+        Point baseCoordinates, Graphics container)
+    {
+        var font = new Font("Consolas", SCORE_FONT_SIZE);
+        container.DrawString(
+            world.TotalScore.ToString(),
+            font,
+            new SolidBrush(Color.White),
+            baseCoordinates);
     }
 }

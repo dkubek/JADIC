@@ -13,7 +13,7 @@ public class Game
         MainWorld = world;
 
         // TODO: TEMPORARY
-        currentScene = new Scene(MainWorld);
+        currentScene = new EndlessMode(MainWorld);
         currentScene.isRunning = true;
     }
 

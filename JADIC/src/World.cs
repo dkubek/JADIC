@@ -9,17 +9,25 @@ public interface IDrawable
 
 public abstract class GameObject : IDrawable
 {
+    public int PARTICLE_MIN_SIZE = 3;
+    public int PARTICLE_MAX_SIZE = 10;
+
     public Point Position;
     public Size HitboxSize;
     public Rectangle BoundingBox;
     public Control Controls = new Control();
     public Color KeyColor = Color.White;
     public int Lives;
+    public int Score = 0;
 
     public virtual void Update()
     {
         Position = Controls.NextPosition(Position);
     }
+
+    public virtual List<GameObject> Action(World world)
+        => new List<GameObject>();
+
     public abstract void Render(Size resolution, Graphics container);
 
     public virtual bool DetectCollision(GameObject other)
@@ -29,9 +37,9 @@ public abstract class GameObject : IDrawable
         => other.IntersectsWith(new Rectangle(Position, HitboxSize));
 
     public virtual List<Particle> Destroy()
-        => Destroy(3, 10);
+        => DestructionParticles(PARTICLE_MIN_SIZE, PARTICLE_MAX_SIZE);
 
-    public virtual List<Particle> Destroy(int minSize, int maxSize)
+    private List<Particle> DestructionParticles(int minSize, int maxSize)
     {
         Random rng = new Random();
         var particles = new List<Particle>();
@@ -96,6 +104,7 @@ public class World
     public readonly Bitmap Frame;
     public readonly Size Resolution;
     public readonly Graphics bmGraphics;
+    public Random RandomGen = new Random();
 
     public Player MainPlayer;
     public List<GameObject> GameObjects = new List<GameObject>();
@@ -104,6 +113,8 @@ public class World
 
     public CosmicBackground bg;
     public Overlay overlay;
+
+    public int TotalScore = 0;
 
     public World(Size resolution, Player player)
     {

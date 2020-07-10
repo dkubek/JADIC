@@ -29,9 +29,9 @@ namespace JADIC
             Player player =
                 new Player(startingPosition, playerBounds);
 
-            Queue<ControlElement> controlElements = new Queue<ControlElement>(2);
-            controlElements.Enqueue(new LinearTransition(CenterOfRectangle(playerBounds)));
-            controlElements.Enqueue(new PlayerControl(player));
+            var controlElements = new List<ControlElement>(2);
+            controlElements.Add(new LinearTransition(CenterOfRectangle(playerBounds)));
+            controlElements.Add(new PlayerControl(player));
             Control playerControl = new Control(controlElements);
 
             player.Controls = playerControl;

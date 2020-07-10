@@ -13,26 +13,26 @@ public class ControlElement
 
 public class Control
 {
-    private Queue<ControlElement> controls;
+    private Queue<ControlElement> controlQueue;
     private ControlElement currentControl;
 
     public Control() : this(new ControlElement()) { }
 
     public Control(ControlElement controlElement)
     {
-        controls = new Queue<ControlElement>();
+        controlQueue = new Queue<ControlElement>();
         currentControl = controlElement;
         controlElement.isRunning = true;
     }
-    public Control(Queue<ControlElement> controls)
+    public Control(List<ControlElement> controls)
     {
-        this.controls = controls;
+        controlQueue = new Queue<ControlElement>(controls);
 
         if (controls.Count == 0)
             throw new ArgumentException(
                 "Empty control queue. At least one control element must be supplied");
 
-        currentControl = controls.Dequeue();
+        currentControl = controlQueue.Dequeue();
         currentControl.isRunning = true;
     }
 
@@ -43,9 +43,9 @@ public class Control
         {
             newPosition = currentControl.NextPosition(currentPosition);
         }
-        else if (controls.Count != 0)
+        else if (controlQueue.Count != 0)
         {
-            currentControl = controls.Dequeue();
+            currentControl = controlQueue.Dequeue();
             currentControl.isRunning = true;
             newPosition = currentControl.NextPosition(currentPosition);
         }
@@ -69,12 +69,18 @@ public class ConstantDisplacement : ControlElement
 
 public class LinearTransition : ControlElement
 {
-    const int TransitionSpeed = 3;
+    readonly int TransitionSpeed = 3;
     private Point destinationPosition;
 
     public LinearTransition(Point destination)
     {
         destinationPosition = destination;
+    }
+
+    public LinearTransition(Point destination, int speed)
+    {
+        destinationPosition = destination;
+        TransitionSpeed = speed;
     }
 
     public override Point NextPosition(Point currentPosition)
@@ -90,6 +96,34 @@ public class LinearTransition : ControlElement
         {
             displacement.Normalize();
             displacement.Multiply(TransitionSpeed);
+            return Vector.Add(currentPosition, displacement);
+        }
+    }
+}
+
+public class Follow : ControlElement
+{
+    public readonly GameObject FollowObject;
+    public int FollowSpeed;
+
+    public Follow(GameObject followObject, int followSpeed)
+    {
+        FollowObject = followObject;
+        FollowSpeed = followSpeed;
+    }
+
+    public override Point NextPosition(Point currentPosition)
+    {
+        Vector displacement = new Vector(currentPosition, FollowObject.Position);
+
+        if (displacement.Size() <= FollowSpeed)
+        {
+            return FollowObject.Position;
+        }
+        else
+        {
+            displacement.Normalize();
+            displacement.Multiply(FollowSpeed);
             return Vector.Add(currentPosition, displacement);
         }
     }
@@ -128,7 +162,7 @@ public class PlayerControl : ControlElement
         return new Point(boundedX, boundedY);
     }
 
-    public static void HandlePlayerKeys(
+    public static void HandlePlayerMovementKeys(
         Player player, Keys keyCode, bool release)
     {
         int verticalChange = 0;
