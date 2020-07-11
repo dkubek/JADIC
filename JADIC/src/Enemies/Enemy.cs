@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Drawing;
 
+/// <summary>
+/// The Enemy class represents the default enemy.
+/// </summary>
 public class Enemy : GameObject
 {
     const int ENEMY_SIZE = 70;
     const int PROJECTILE_COOLDOWN = 100;
 
     private int currentProjectileCooldown = PROJECTILE_COOLDOWN;
+    /// <summary>
+    /// Default probability for firing of an projectile.
+    /// </summary>
     readonly double projectileProbability = 0.3;
 
     private readonly Brush brush;
@@ -30,7 +36,7 @@ public class Enemy : GameObject
 
     public override void Render(Size resolution, Graphics container)
     {
-        var diamondPoints = generateDiamondPoints();
+        var diamondPoints = GenerateDiamondPoints();
         container.FillPolygon(brush, diamondPoints);
     }
 
@@ -59,13 +65,18 @@ public class Enemy : GameObject
 
     public override bool DetectCollision(GameObject other)
     {
+        // Ignore own and other enemy projjectiles.
         if (other is EnemyProjectile)
             return false;
 
         return base.DetectCollision(other);
     }
 
-    private Point[] generateDiamondPoints()
+    /// <summary>
+    /// Points representing the enemy sprite. Meant to be used with the FillPolygon method.
+    /// </summary>
+    /// <returns>Array of Points.</returns>
+    private Point[] GenerateDiamondPoints()
     {
         Point top = new Point(
             Position.X + HitboxSize.Width / 2, Position.Y);
@@ -81,6 +92,10 @@ public class Enemy : GameObject
     }
 }
 
+/// <summary>
+/// EnemyProjectile contains logic and customization of the enemy's 
+/// projectile.
+/// </summary>
 public class EnemyProjectile : Projectile
 {
     const int ENEMY_PROJECTILE_SPEED = 10;

@@ -8,11 +8,18 @@ public class Particle : IDrawable
 {
     private Point position;
     private Size size;
-    private Control controls;
-    private Brush keyBrush;
+    private readonly Control controls;
+    private readonly Brush keyBrush;
 
     public Point Position { get => position; }
 
+    /// <summary>
+    /// Create new generic Particle.
+    /// </summary>
+    /// <param name="startLocation">Point of the starting location.</param>
+    /// <param name="size">Size of the particle.</param>
+    /// <param name="controls">Control object for the particle.</param>
+    /// <param name="color">Color of the particle.</param>
     public Particle(
         Point startLocation, int size, Control controls, Color color)
     {

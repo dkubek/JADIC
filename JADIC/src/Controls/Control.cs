@@ -5,21 +5,37 @@ using System.Windows.Forms;
 
 namespace JADIC.Controls
 {
+    /// <summary>
+    /// The Control object is a collection of ControlElements. It oversees the
+    /// correct sucession of individual control elements.
+    /// </summary>
     public class Control
     {
-        private Queue<ControlElement> controlQueue;
+        private readonly Queue<ControlElement> controlQueue;
         private ControlElement currentControl;
 
         public bool Ended = false;
 
+        /// <summary>
+        /// Create a dummy Control that does nothing.
+        /// </summary>
         public Control() : this(new ControlElement()) { }
 
+        /// <summary>
+        /// Create Control object from one ControlElement.
+        /// </summary>
+        /// <param name="controlElement">Main ControlElement</param>
         public Control(ControlElement controlElement)
         {
             controlQueue = new Queue<ControlElement>();
             currentControl = controlElement;
             controlElement.isRunning = true;
         }
+
+        /// <summary>
+        /// Create Control from given list of control elements.
+        /// </summary>
+        /// <param name="controls">List of ControlElements.</param>
         public Control(List<ControlElement> controls)
         {
             if (controls.Count == 0)
@@ -34,6 +50,12 @@ namespace JADIC.Controls
             currentControl.isRunning = true;
         }
 
+        /// <summary>
+        /// Given current position return the next position based on the currently
+        /// active ControlElement.
+        /// </summary>
+        /// <param name="currentPosition">Point of the current position.</param>
+        /// <returns>Point of the next position.</returns>
         public Point NextPosition(Point currentPosition)
         {
             Point newPosition = currentPosition;
@@ -56,17 +78,30 @@ namespace JADIC.Controls
         }
     }
 
+    /// <summary>
+    /// ControlElement decides on the next position of an object based on
+    /// it's current position.
+    /// </summary>
     public class ControlElement
     {
         public bool isRunning = false;
 
+        /// <summary>
+        /// Given current position return the next position.
+        /// </summary>
+        /// <param name="currentPosition">Point of the current position</param>
+        /// <returns>Point of the next position.</returns>
         public virtual Point NextPosition(Point currentPosition)
             => currentPosition;
     }
 
+    /// <summary>
+    /// ConstantDisplacement moves the object always by a given constant 
+    /// displacement vector.
+    /// </summary>
     public class ConstantDisplacement : ControlElement
     {
-        private Vector displacement;
+        private readonly Vector displacement;
 
         public ConstantDisplacement(Vector displacement)
         {
@@ -77,6 +112,9 @@ namespace JADIC.Controls
             => Vector.Add(currentPosition, displacement);
     }
 
+    /// <summary>
+    /// LinearTransition moves object to the specified destination.
+    /// </summary>
     public class LinearTransition : ControlElement
     {
         readonly int TransitionSpeed = 3;
@@ -111,6 +149,10 @@ namespace JADIC.Controls
         }
     }
 
+    /// <summary>
+    /// Follow will generate next position so it will follow the specified
+    /// GameObject.
+    /// </summary>
     public class Follow : ControlElement
     {
         public readonly GameObject FollowObject;
@@ -139,9 +181,14 @@ namespace JADIC.Controls
         }
     }
 
+    /// <summary>
+    /// PlayerControl is a special ControlElement that generates new position
+    /// based on the given state of player and pressed keys. It also specifies
+    /// a static method for handlig key presses connected with player movement.
+    /// </summary>
     public class PlayerControl : ControlElement
     {
-        private Player player;
+        private readonly Player player;
         public PlayerControl(Player player)
         {
             this.player = player;
@@ -172,6 +219,12 @@ namespace JADIC.Controls
             return new Point(boundedX, boundedY);
         }
 
+        /// <summary>
+        /// Update the player direction based on the key presses.
+        /// </summary>
+        /// <param name="player">The Player object to update</param>
+        /// <param name="keyCode">The Key pressed.</param>
+        /// <param name="release">Whether the key was released (true).</param>
         public static void HandlePlayerMovementKeys(
             Player player, Keys keyCode, bool release)
         {

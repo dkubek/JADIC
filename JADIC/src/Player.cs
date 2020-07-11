@@ -1,6 +1,11 @@
 ﻿using JADIC.Controls;
 using System.Drawing;
 
+/// <summary>
+/// The Player class contains data and information about the player. It is a
+/// special case of an game object with special functionality and specific
+/// methods.
+/// </summary>
 public class Player : GameObject 
 {
     public const int PROJECTILE_COOLDOWN = 25;
@@ -34,6 +39,12 @@ public class Player : GameObject
             base.Update();
     }
 
+    /// <summary>
+    /// Spawn projectile before the player. Projectile is always being shot
+    /// from from before the player to the right. After firing projectile it
+    /// goes on a cooldown.
+    /// </summary>
+    /// <returns>A new PlayerProjectile object.</returns>
     public PlayerProjectile SpawnProjectile()
     {
         if (projectileCooldownCurrent == 0)
@@ -50,6 +61,10 @@ public class Player : GameObject
         return null;
     }
 
+    /// <summary>
+    /// THe center of hitbox.
+    /// </summary>
+    /// <returns>Point of the center of the hitbox.</returns>
     private Point Center()
     {
         return new Point(
@@ -59,11 +74,16 @@ public class Player : GameObject
 
     public override void Render(Size resolution, Graphics container)
     {
-        var trianglePoints = generateTrianglePoints();
+        var trianglePoints = GenerateTrianglePoints();
         container.FillPolygon(brush, trianglePoints);
     }
 
-    private Point[] generateTrianglePoints()
+    /// <summary>
+    /// Array of points to be used with the FillPolygon method. Points 
+    /// represent the player's spaseship.
+    /// </summary>
+    /// <returns>Array of Points.</returns>
+    private Point[] GenerateTrianglePoints()
     {
         Point center = Center();
         Point topLeft = new Point(
@@ -82,6 +102,7 @@ public class Player : GameObject
 
     public override bool DetectCollision(GameObject other)
     {
+        // Ignore own projectiles.
         if (other is PlayerProjectile)
             return false;
 
@@ -89,6 +110,10 @@ public class Player : GameObject
     }
 }
 
+/// <summary>
+/// PlayerProjectile contains logic and customization of the player's 
+/// projectile.
+/// </summary>
 public class PlayerProjectile : Projectile 
 {
     const int SPEED = 15;

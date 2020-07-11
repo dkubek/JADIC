@@ -13,6 +13,10 @@ public class Game
     public World MainWorld;
     private Scene currentScene = null;
 
+    /// <summary>
+    /// Create new Game.
+    /// </summary>
+    /// <param name="windowAreaSize">The size of the playable area.</param>
     public Game(Size windowAreaSize)
     {
         Initialize(windowAreaSize);

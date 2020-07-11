@@ -5,6 +5,9 @@ using JADIC.Controls;
 
 namespace JADIC.Scenes
 {
+    /// <summary>
+    /// Incremental spawning of enemies until the player runs out of lievs.
+    /// </summary>
     public class EndlessMode : Scene
     {
         private int enemySpawnCooldown = 100;
@@ -65,7 +68,7 @@ namespace JADIC.Scenes
                 {
                     if (MainWorld.RandomGen.NextDouble() < spawnProbability)
                     {
-                        generateEnemy();
+                        GenerateEnemy();
                         spawnCooldown = enemySpawnCooldown;
                     }
                 }
@@ -76,7 +79,7 @@ namespace JADIC.Scenes
             }
         }
 
-        private void generateEnemy()
+        private void GenerateEnemy()
         {
             var enemy = new Enemy(
                 new Point(
@@ -86,9 +89,11 @@ namespace JADIC.Scenes
 
             var destination = new Point(MainWorld.Resolution.Width / 2, enemy.Position.Y);
 
-            var controls = new List<ControlElement>();
-            controls.Add(new LinearTransition(destination, 3));
-            controls.Add(new Follow(MainWorld.MainPlayer, 5));
+            var controls = new List<ControlElement>
+            {
+                new LinearTransition(destination, 3),
+                new Follow(MainWorld.MainPlayer, 5)
+            };
             enemy.Controls = new Control(controls);
 
             MainWorld.GameObjects.Add(enemy);

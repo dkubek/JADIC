@@ -1,5 +1,8 @@
 ﻿using System.Drawing;
 
+/// <summary>
+/// Projectile is the base class for all projectiles.
+/// </summary>
 public class Projectile : GameObject
 {
     protected Brush keyBrush;

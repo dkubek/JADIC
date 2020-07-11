@@ -3,6 +3,9 @@ using System.Windows.Forms;
 
 namespace JADIC.Scenes
 {
+    /// <summary>
+    /// The title screen.
+    /// </summary>
     public class Intro : Scene
     {
         const int BLINK_INTERVAL = 10;

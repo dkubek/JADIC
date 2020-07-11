@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Drawing;
 
+/// <summary>
+/// CosmicBackground is the default ambient background fot the game.
+/// It contains three levels of stars each with decreasing speed and size of
+/// the stars creating an illusion of space.
+/// </summary>
 public class CosmicBackground : IDrawable
 {
     private Point[] FirstLevel;
@@ -13,6 +18,12 @@ public class CosmicBackground : IDrawable
     private readonly Random rnd = new Random();
     private readonly SolidBrush starBrush;
 
+    /// <summary>
+    /// Create new CosmicBackground.
+    /// </summary>
+    /// <param name="stars">Number of stars on the first level.</param>
+    /// <param name="baseSpeed">Base speed of stars on.</param>
+    /// <param name="bounds">Bounds where to despawn stars.</param>
     public CosmicBackground(int stars, int baseSpeed, Size bounds)
     {
         this.baseSpeed = baseSpeed;

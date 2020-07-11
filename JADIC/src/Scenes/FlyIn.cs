@@ -4,6 +4,9 @@ using JADIC.Controls;
 
 namespace JADIC.Scenes
 {
+    /// <summary>
+    /// The player space ship flies in to the designated location.
+    /// </summary>
     public class FlyIn : Scene
     {
         public FlyIn(World world) : base(world) { }

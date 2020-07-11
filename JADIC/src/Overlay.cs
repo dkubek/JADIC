@@ -1,6 +1,9 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
+/// <summary>
+/// Overlay displays information about current state to the player.
+/// </summary>
 public class Overlay : IDrawable
 {
     const int COOLDOWN_METER_WIDTH = 300;
@@ -11,7 +14,7 @@ public class Overlay : IDrawable
     const int HEART_PADDING = 10;
     const int SCORE_FONT_SIZE = 25;
 
-    private World world;
+    private readonly World world;
     public Overlay(World world)
     {
         this.world = world;

@@ -5,6 +5,11 @@ using JADIC.Controls;
 
 namespace JADIC.Scenes
 {
+    /// <summary>
+    /// The Scene class is the main way for game scripting and specifying 
+    /// GameObject bahaviour. The base abstract class defines a number of 
+    /// default methods for handling destoyed or out of bounds objects.
+    /// </summary>
     public abstract class Scene : IDrawable
     {
         public World MainWorld;
@@ -18,8 +23,15 @@ namespace JADIC.Scenes
             isRunning = false;
         }
 
-        public abstract void Update();
+        /// <summary>
+        /// This method is called when the Scene is first being initialized.
+        /// </summary>
         public abstract void Initialize();
+
+        /// <summary>
+        /// This method is called every tick. The game state should be updated here.
+        /// </summary>
+        public abstract void Update();
 
         protected virtual void UpdatePlayer()
         {
