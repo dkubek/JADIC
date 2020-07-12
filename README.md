@@ -15,7 +15,7 @@ being raised incrementally.
 To build the game from source, open the solution in Visual Studio and from
 there build and run it using the ``F5`` key.
 
-A compiled executable is available in ``JADIC/JADIC/release/``.
+A compiled executable is available in ``release/``.
 
 
 ## Controls
@@ -30,7 +30,7 @@ and ``D`` keys. To fire a missile press ``Spacebar``. That's it!
    keys are stuck. This is most likely caused by how Windows Forms handles
    input keys.
 
- - In a very small window between players death and the GAME OVER scree,
+ - In a very small window between players death and the GAME OVER screen,
    It is possible to fire a projectile have it stuck there.
 
 
