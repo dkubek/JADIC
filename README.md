@@ -43,13 +43,13 @@ and ``D`` keys. To fire a missile press ``Spacebar``. That's it!
 ## Changelog
 
 ### v1.1
-    - Balance changes, the game starts more difficult and  gets even more 
-      difficult much faster.
-    - The cursor is now hidden on hover as not to confuse the user.
-    - It is now possible to exit the game using the *Escape* key.
+ - Balance changes, the game starts more difficult and  gets even more 
+   difficult much faster.
+ - The cursor is now hidden on hover as not to confuse the user.
+ - It is now possible to exit the game using the *Escape* key.
 
 ### v1.0
-    - First build
+ - First build
 
 
 # Software Documentation
