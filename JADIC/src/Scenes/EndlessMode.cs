@@ -11,6 +11,7 @@ namespace JADIC.Scenes
     public class EndlessMode : Scene
     {
         private int enemySpawnCooldown = 100;
+        private int enemySpeed = 3;
         private int maxEnemies = 1;
         private int enemies = 0;
         private int spawnCooldown = 0;
@@ -55,9 +56,31 @@ namespace JADIC.Scenes
 
         private void UpdateDifficulty()
         {
-            double x = MainWorld.TotalScore / 1000;
-            enemyProjectileProbability = Math.Min(0.07 * x + 0.3, 0.7);
-            spawnProbability = Math.Min(0.02 * x + 0.3, 0.5);
+            double scoreFactor = MainWorld.TotalScore / 1000;
+            UpdateEnemyProjectileProbability(scoreFactor);
+            UpdateSpawnProbability(scoreFactor);
+            UpdateSpawnCooldown(scoreFactor);
+            UpdateEnemySpeed(scoreFactor);
+        }
+
+        private void UpdateEnemyProjectileProbability(double scoreFactor)
+        {
+            enemyProjectileProbability = Math.Min(0.1 * scoreFactor + 0.3, 0.9);
+        }
+
+        private void UpdateSpawnProbability(double scoreFactor)
+        {
+            spawnProbability = Math.Min(0.05 * scoreFactor + 0.3, 0.5);
+        }
+
+        private void UpdateSpawnCooldown(double scoreFactor)
+        {
+            enemySpawnCooldown = Math.Max(100 - 7 * (int)(scoreFactor), 50);
+        }
+
+        private void UpdateEnemySpeed(double scoreFactor)
+        {
+            enemySpeed = 3 + (int)(scoreFactor);
         }
 
         private void SpawnEnemies()
@@ -91,7 +114,7 @@ namespace JADIC.Scenes
 
             var controls = new List<ControlElement>
             {
-                new LinearTransition(destination, 3),
+                new LinearTransition(destination, enemySpeed),
                 new Follow(MainWorld.MainPlayer, 5)
             };
             enemy.Controls = new Control(controls);

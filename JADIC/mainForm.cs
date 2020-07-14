@@ -14,6 +14,9 @@ namespace JADIC
             mainTimer.Enabled = true;
             DoubleBuffered = true;
 
+            Cursor.Hide();
+
+
             // Workaround to get the actual window size without toolbar
             Rectangle screenRectangle = 
                 RectangleToScreen(ClientRectangle);

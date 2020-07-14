@@ -8,7 +8,7 @@ using System.Drawing;
 public class Enemy : GameObject
 {
     const int ENEMY_SIZE = 70;
-    const int PROJECTILE_COOLDOWN = 100;
+    const int PROJECTILE_COOLDOWN = 60;
 
     private int currentProjectileCooldown = PROJECTILE_COOLDOWN;
     /// <summary>

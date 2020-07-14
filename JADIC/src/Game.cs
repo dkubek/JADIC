@@ -97,6 +97,13 @@ public class Game
 
     public void HandleKeys(Keys keycode, bool release)
     {
+
+        // Exit on escape key
+        if (keycode == Keys.Escape && !release)
+        {
+            Application.Exit();
+        }
+
         currentScene.HandleKeys(keycode, release);
     }
 }
