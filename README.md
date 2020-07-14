@@ -1,4 +1,10 @@
-# User Documentation
+# JADIC Guide
+
+**Author:** Dávid Kubek
+
+This game was created as a final assignment for the **NPRG031: Programování 2**
+course in accademic year **2019/20** at 
+**Charles University Prague: Faculty of Mathematics and Physics**.
 
 
 ## About
@@ -15,7 +21,7 @@ being raised incrementally.
 To build the game from source, open the solution in Visual Studio and from
 there build and run it using the ``F5`` key.
 
-A compiled executable is available in ``JADIC/JADIC/release/``.
+A compiled executable is available in *releases* at github.
 
 
 ## Controls
@@ -33,6 +39,17 @@ and ``D`` keys. To fire a missile press ``Spacebar``. That's it!
  - In a very small window between players death and the GAME OVER scree,
    It is possible to fire a projectile have it stuck there.
 
+
+## Changelog
+
+### v1.1
+    - Balance changes, the game starts more difficult and  gets even more 
+      difficult much faster.
+    - The cursor is now hidden on hover as not to confuse the user.
+    - It is now possible to exit the game using the *Escape* key.
+
+### v1.0
+    - First build
 
 
 # Software Documentation
