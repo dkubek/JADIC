@@ -36,7 +36,7 @@ and ``D`` keys. To fire a missile press ``Spacebar``. That's it!
    keys are stuck. This is most likely caused by how Windows Forms handles
    input keys.
 
- - In a very small window between players death and the GAME OVER scree,
+ - In a very small window between players death and the GAME OVER screen,
    It is possible to fire a projectile have it stuck there.
 
 
